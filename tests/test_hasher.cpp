@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 
 #include "dupfind/hasher.hpp"
+#include "dupfind/grouper.hpp"
+
+using namespace dupfind;
 
 TEST(Hasher, SameBytesProduceSameHash) {
     const std::string a = "matf";
