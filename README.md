@@ -1,0 +1,1 @@
+![ci](https://github.com/DaliborMax/dupfind/actions/workflows/ci.yml/badge.svg)

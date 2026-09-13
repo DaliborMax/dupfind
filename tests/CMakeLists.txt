@@ -1,0 +1,22 @@
+include(FetchContent)
+
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.get_directory_property
+    GIT_TAG v1.14.0
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+add_executable(dupfind_tests
+    test_hasher.cpp
+    test_grouper.cpp)
+
+target_link_libraries(dupfind_tests PRIVATE
+    dupfind_core
+    GTest::gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(dupfind_tests)
