@@ -4,6 +4,31 @@
 
 It reduces unnecessary hashing by progressively filtering files based on their size, a quick hash, and finally their full-file hash.
 
+## Build
+
+Clone the repository and configure the project with CMake:
+
+```bash
+git clone https://github.com/DaliborMax/dupfind/
+cd dupfind
+
+cmake -B build
+cmake --build build -j
+```
+
+Run the test suite with:
+
+```bash
+ctest --test-dir build
+```
+
+## Run
+# On Linux/macOS/WSL:
+./build/dupfind path/to/folder
+
+# On Windows (Command Prompt/PowerShell):
+.\build/dupfind.exe path/to/folder
+
 ## Features
 
 * Written in C++17
@@ -68,29 +93,7 @@ Total wasted space due to duplicates: 27731 bytes.
 
 The final line shows the total amount of disk space occupied by redundant copies.
 
-## Build
 
-Clone the repository and configure the project with CMake:
-
-```bash
-git clone <repository-url>
-cd dupfind
-
-cmake -B build
-cmake --build build -j
-```
-
-Run the test suite with:
-
-```bash
-ctest --test-dir build
-```
-
-## Usage
-
-```text
-dupfind <dir> [--min-size N] [--format text|json|csv]
-```
 
 Example:
 
