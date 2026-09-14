@@ -9,6 +9,10 @@ namespace dupfind {
 struct FileEntry {
     std::filesystem::path path;
     std::uintmax_t size = 0;
+
+    bool operator== (const FileEntry& f) {
+        return f.path == path && f.size == size;
+    }
 };
 
 struct DuplicateGroup {

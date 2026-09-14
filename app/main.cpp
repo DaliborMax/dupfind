@@ -43,7 +43,6 @@ int main(int argc, char** argv) {
         for (const auto& p : group.paths) {
             std::cout << "  - " << p.string() << "\n";
         }
-        std::cout << "----------------------------------------\n";
     }
 
     std::cout << "Total wasted space due to duplicates: "

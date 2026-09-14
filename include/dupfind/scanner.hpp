@@ -13,7 +13,10 @@ namespace dupfind
     struct ScanResult {
         std::vector<FileEntry> files;
         std::vector<std::string> errors;
-        std::vector<DuplicateGroup> duplicates;
+
+        bool operator== (const ScanResult& s) const {
+            return files.data() == s.files.data() && errors.data() == s.errors.data();
+        }
     };
 
     

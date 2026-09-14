@@ -33,11 +33,9 @@ ctest --test-dir build
 
 * Written in C++17
 * Groups files by file size before hashing
-* Uses a quick hash of the first 4 KB
 * Computes a full hash only for files that remain possible duplicates
 * Reports duplicate groups and wasted disk space
 * Supports recursive directory scanning
-* JSON and CSV output formats
 * Unit tests with GoogleTest
 * CMake-based build system
 
@@ -49,15 +47,11 @@ ctest --test-dir build
 
    Files with different sizes cannot be duplicates, so they are immediately separated.
 
-2. **Quick hash**
-
-   Files with the same size are compared using a hash of their first 4 KB.
-
-3. **Full hash**
+2. **Full hash**
 
    Only files that still match after the previous filters are fully hashed.
 
-4. **Duplicate groups**
+3. **Duplicate groups**
 
    Files with the same size and full hash are reported as duplicates.
 
@@ -94,25 +88,6 @@ Total wasted space due to duplicates: 27731 bytes.
 The final line shows the total amount of disk space occupied by redundant copies.
 
 
-
-Example:
-
-```bash
-dupfind .
-```
-
-JSON output:
-
-```bash
-dupfind . --format json
-```
-
-CSV output:
-
-```bash
-dupfind . --format csv
-```
-
 ## Project structure
 
 ```text
@@ -144,7 +119,7 @@ ctest --test-dir build
 
 ## Limitations
 
-The current implementation uses **FNV-1a** for hashing. FNV-1a is not a cryptographic hash and should not be used as a security or forensic hash.
+The current implementation uses **FNV-1a** for hashing. FNV-1a is not a cryptographic hash and SHOULD NOT BE USED as a security or forensic hash.
 
 `dupfind` currently considers files with the same size and hash to be duplicates without performing a final byte-by-byte comparison. Although hash collisions are unlikely in normal use, they are theoretically possible.
 

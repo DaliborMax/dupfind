@@ -12,25 +12,19 @@
 
 namespace dupfind {
 
-std::vector<std::vector<FileEntry>>
-group_by_size(const std::vector<FileEntry>& files) {
-    std::vector<std::vector<FileEntry>> groups;
+std::vector<std::vector<FileEntry>> group_by_size(const std::vector<FileEntry>& files) {
+    std::unordered_map<std::uintmax_t, std::vector<FileEntry>> groupsMap;
 
     for (const auto& file : files) {
-        bool found = false;
-
-        for (auto& g : groups) {
-            if (!g.empty() && g.front().size == file.size) {
-                g.push_back(file);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            groups.push_back({file});
-        }
+        groupsMap[file.size].push_back(file);
     }
+
+    std::vector<std::vector<FileEntry>> groups;
+
+    for (auto& [size, group] : groupsMap) {
+        groups.push_back(std::move(group));
+    }
+
 
     return groups;
 }
@@ -70,7 +64,7 @@ std::vector<DuplicateGroup> find_duplicates(
         files_by_size[size].push_back(std::move(entry));
     }
 
-    constexpr std::size_t max_bytes = 1 << 31;
+    constexpr std::size_t max_bytes = 1ULL << 31;
 
     std::vector<DuplicateGroup> groups;
 

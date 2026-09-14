@@ -43,6 +43,11 @@ ScanResult scan_directory(const std::filesystem::path& root) {
 
         result.files.push_back(std::move(file));
     }
+    
+    for (size_t i = 0; i < result.files.size(); ++i) {
+        std::cout << "Path: " << result.files[i].path << "\n";
+        std::cout << "Size: " << result.files[i].size << "\n";
+    }
 
     return result;
 }
