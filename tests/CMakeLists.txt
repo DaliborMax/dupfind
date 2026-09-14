@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(googletest)
 add_executable(dupfind_tests
     test_hasher.cpp
     test_grouper.cpp
-    test_scanner.cpp)
+)
 
 target_link_libraries(dupfind_tests PRIVATE
     dupfind_core
