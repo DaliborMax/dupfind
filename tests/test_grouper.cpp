@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
+#include <fstream>
 
 #include "dupfind/types.hpp"
 #include "dupfind/grouper.hpp"
 #include "dupfind/size.hpp"
+
 
 using namespace dupfind;
 
@@ -17,13 +19,21 @@ TEST(Grouper, GroupBySizeSeparatesDifferentSizes) {
 }
 
 TEST(Grouper, FindDuplicatesIdentifiesSameSizeAndHash) {
+    std::ofstream("a.txt") << "1234567890";
+    std::ofstream("b.txt") << "1234567890";
+
     const std::vector<FileEntry> files{
         {"a.txt", 10},
         {"b.txt", 10},
     };
+
     auto duplicates = find_duplicates(files);
+
     ASSERT_EQ(duplicates.size(), 1u);
     EXPECT_EQ(duplicates[0].paths.size(), 2u);
+
+    std::filesystem::remove("a.txt");
+    std::filesystem::remove("b.txt");
 }
 
 TEST(Grouper, WastedBytesCalculatesCorrectly) {
