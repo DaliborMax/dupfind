@@ -1,34 +1,34 @@
-#include "include/dupfind/hasher.hpp"
+#include "dupfind/hasher.hpp"
+
+#include <algorithm>
 #include <fstream>
-#include <iostream>
-#include <sstream>
+#include <vector>
 
-using namespace dupfind;
+namespace dupfind {
 
-std::uint64_t dupfind::hash_bytes(const void* data, std::size_t size, std::uint64_t seed = fnv_offset_basis) {
-    
+std::uint64_t hash_bytes(const void* data, std::size_t size, std::uint64_t seed) {
     std::uint64_t hash = seed;
 
-    const std::uint64_t* block = static_cast<const std::uint64_t*>(data);
+    const std::uint8_t* bytes = static_cast<const std::uint8_t*>(data);
 
     for (std::size_t i = 0; i < size; ++i) {
-        hash ^= block[i];
+        hash ^= static_cast<std::uint64_t>(bytes[i]);
         hash *= fnv_prime;
     }
 
     return hash;
 }
 
-
-std::optional<std::uint64_t> dupfind::hash_file(const std::filesystem::path& path, std::size_t max_bytes = 0) {
-
-    if (!std::filesystem::exists(path)) {
+std::optional<std::uint64_t> hash_file(const std::filesystem::path& path,
+                                       std::size_t max_bytes) {
+    std::error_code ec;
+    if (!std::filesystem::exists(path, ec) || ec) {
         return std::nullopt;
     }
 
     std::ifstream file(path, std::ios::binary);
     if (!file.is_open()) {
-        return std::nullopt; 
+        return std::nullopt;
     }
 
     std::uint64_t current_hash = fnv_offset_basis;
@@ -48,8 +48,8 @@ std::optional<std::uint64_t> dupfind::hash_file(const std::filesystem::path& pat
             bytes_to_read = std::min(buffer_size, max_bytes - total_bytes_read);
         }
 
-        file.read(buffer.data(), bytes_to_read);
-        std::size_t bytes_read = file.gcount();
+        file.read(buffer.data(), static_cast<std::streamsize>(bytes_to_read));
+        std::size_t bytes_read = static_cast<std::size_t>(file.gcount());
 
         if (bytes_read == 0) {
             break;
@@ -60,4 +60,6 @@ std::optional<std::uint64_t> dupfind::hash_file(const std::filesystem::path& pat
     }
 
     return current_hash;
+}
+
 }

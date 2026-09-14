@@ -1,28 +1,16 @@
-#include <iostream>
-#include <unordered_map>
-#include <filesystem>
+#include "dupfind/size.hpp"
 
-namespace fs = std::filesystem;
+#include <system_error>
 
-namespace dupfind
-{
+namespace dupfind {
 
-    std::uintmax_t get_file_size(fs::path path) {
-        
-        try {
-
-            if (fs::exists(path) && fs::is_regular_file(path)) {
-                std::uintmax_t size = fs::file_size(path);
-                return size;
-            } else {
-                std::cout << "File does not exists or it is not regular file!" << std::endl;
-            }
-
-        } catch(const fs::filesystem_error& e) {
-            std::cerr << "Error: " << e.what() << '\n';
-        }
-
+std::uintmax_t get_file_size(const std::filesystem::path& path) {
+    std::error_code ec;
+    auto size = std::filesystem::file_size(path, ec);
+    if (ec) {
         return 0;
     }
+    return size;
+}
 
 }

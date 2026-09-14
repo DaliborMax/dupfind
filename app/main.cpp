@@ -1,47 +1,53 @@
-#include <iostream>
+#include <cstdint>
 #include <filesystem>
+#include <iostream>
 #include <vector>
 
-#include "include/dupfind/grouper.hpp"
-#include "include/dupfind/scanner.hpp"
-#include "include/dupfind/hasher.hpp"
+#include "dupfind/grouper.hpp"
+#include "dupfind/hasher.hpp"
+#include "dupfind/scanner.hpp"
 
 namespace fs = std::filesystem;
 using namespace dupfind;
 
-
 int main(int argc, char** argv) {
-
     if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << "<path_to_folder>\n";
+        std::cerr << "Usage: " << argv[0] << " <path_to_folder>\n";
         return 1;
     }
 
     fs::path target_path = argv[1];
 
     if (!fs::exists(target_path) || !fs::is_directory(target_path)) {
-        std::cerr << "Error: Path does not exists or it is not directory!\n";
+        std::cerr << "Error: Path does not exist or is not a directory!\n";
+        return 1;
     }
 
-    std::cout << "Scanning the directory..." << std::endl;
+    std::cout << "Scanning the directory...\n";
 
-    dupfind::ScanResult files = dupfind::scan_directory(target_path);
+    ScanResult files = scan_directory(target_path);
 
-    std::vector<dupfind::DuplicateGroup> duplicates = dupfind::find_duplicates(files.files);
+    if (!files.errors.empty()) {
+        std::cerr << "Encountered " << files.errors.size()
+                  << " error(s) while scanning.\n";
+    }
 
-    std::uintmax_t total_wasted = dupfind::wasted_bytes(duplicates);
+    std::vector<DuplicateGroup> duplicates = find_duplicates(files.files);
+
+    std::uintmax_t total_wasted = wasted_bytes(duplicates);
 
     std::cout << "\nDuplicates found:\n";
     for (const auto& group : duplicates) {
-        std::cout << "File size: " << group.size << " bytes (Hash: " << group.hash << ")\n";
+        std::cout << "File size: " << group.size
+                  << " bytes (Hash: " << group.hash << ")\n";
         for (const auto& p : group.paths) {
-            std::cout << "  - " << p << "\n";
+            std::cout << "  - " << p.string() << "\n";
         }
         std::cout << "----------------------------------------\n";
     }
 
-    std::cout << "Total wasted space due to duplicates: " << total_wasted << " bajtova.\n";
-
+    std::cout << "Total wasted space due to duplicates: "
+              << total_wasted << " bytes.\n";
 
     return 0;
 }

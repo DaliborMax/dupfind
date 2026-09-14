@@ -1,12 +1,10 @@
-#include <iostream>
-#include <unordered_map>
+#pragma once
+
+#include <cstdint>
 #include <filesystem>
 
-namespace fs = std::filesystem;
+namespace dupfind {
 
-namespace dupfind
-{
-
-    std::uintmax_t get_file_size(fs::path path);
+std::uintmax_t get_file_size(const std::filesystem::path& path);
 
 }

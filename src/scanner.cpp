@@ -1,29 +1,50 @@
+#include "dupfind/scanner.hpp"
+
 #include <filesystem>
 #include <iostream>
-#include <unordered_map>
-#include <vector>
 
-#include "include/dupfind/scanner.hpp"
-#include "include/dupfind/hasher.hpp"
-#include "include/dupfind/grouper.hpp"
-#include "include/dupfind/size.hpp"
+namespace dupfind {
 
-using namespace dupfind;
-namespace fs = std::filesystem;
+ScanResult scan_directory(const std::filesystem::path& root) {
+    ScanResult result;
 
-dupfind::ScanResult scan_directory(const std::filesystem::path& root) {
-    dupfind::ScanResult result;
-
-    if (!fs::exists(root) || !fs::is_directory(root)) {
+    std::error_code ec;
+    if (!std::filesystem::exists(root, ec) || ec ||
+        !std::filesystem::is_directory(root, ec) || ec) {
         std::cerr << "Directory does not exist or is not a directory.\n";
-        return result; 
+        return result;
     }
 
-    
+    for (auto it = std::filesystem::recursive_directory_iterator(
+             root, std::filesystem::directory_options::skip_permission_denied, ec);
+         it != std::filesystem::recursive_directory_iterator();
+         it.increment(ec)) {
 
-    
+        if (ec) {
+            result.errors.push_back(ec.message());
+            ec.clear();
+            continue;
+        }
 
-    
+        const auto& entry = *it;
+
+        std::error_code entry_ec;
+        if (!entry.is_regular_file(entry_ec) || entry_ec) {
+            continue;
+        }
+
+        FileEntry file;
+        file.path = entry.path();
+        file.size = entry.file_size(entry_ec);
+        if (entry_ec) {
+            result.errors.push_back(entry_ec.message());
+            continue;
+        }
+
+        result.files.push_back(std::move(file));
+    }
 
     return result;
 }
+
+} // namespace dupfind
