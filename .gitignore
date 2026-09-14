@@ -4,6 +4,7 @@ out/
 .vscode/
 .idea/
 .cache/
+testDir/
 compile_commands.json
 *.o
 *.a

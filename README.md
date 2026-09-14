@@ -1,37 +1,88 @@
 # dupfind
 
-![ci](badge)
+`dupfind` is a fast command-line tool for finding duplicate files, written in C++17.
 
-A fast CLI tool for finding duplicate files, written in C++17 with no external dependencies.
+It reduces unnecessary hashing by progressively filtering files based on their size, a quick hash, and finally their full-file hash.
 
-## Why
+## Features
 
-The naive approach hashes every file. `dupfind` uses three filters to avoid unnecessary work:
-
-## Demo
-
-[asciinema GIF or terminal screenshot]
+* Written in C++17
+* Groups files by file size before hashing
+* Uses a quick hash of the first 4 KB
+* Computes a full hash only for files that remain possible duplicates
+* Reports duplicate groups and wasted disk space
+* Supports recursive directory scanning
+* JSON and CSV output formats
+* Unit tests with GoogleTest
+* CMake-based build system
 
 ## How it works
 
-1. Group files by size
-2. Compute a quick hash of the first 4 KB
-3. Compute the full hash only for files that are still possible duplicates
+`dupfind` uses several filtering stages:
 
-## Results
+1. **File size**
 
-Tested on 120,412 files (38 GB) on an HDD:
+   Files with different sizes cannot be duplicates, so they are immediately separated.
 
-* **dupfind:** 6.2s
-* **`find | md5sum | sort`:** 94s
-* **Duplicate data found:** 3.1 GB
+2. **Quick hash**
+
+   Files with the same size are compared using a hash of their first 4 KB.
+
+3. **Full hash**
+
+   Only files that still match after the previous filters are fully hashed.
+
+4. **Duplicate groups**
+
+   Files with the same size and full hash are reported as duplicates.
+
+This avoids reading the entire contents of files that can already be ruled out by cheaper checks.
+
+## Example
+
+Running `dupfind` on a directory produces output similar to:
+
+```text
+File size: 748 bytes (Hash: 16911946311754036552)
+  - dupfind/build_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-gitclone-lastrun.txt
+  - dupfind/build_deps/googletest-subbuild/googletest-populate-prefix/src/googletest-populate-stamp/googletest-populate-gitinfo.txt
+----------------------------------------
+File size: 86 bytes (Hash: 10865774324573571303)
+  - dupfind/build/CMakeFiles/cmake.check_cache
+  - dupfind/build_deps/googletest-subbuild/CMakeFiles/cmake.check_cache
+----------------------------------------
+File size: 387 bytes (Hash: 15360795553981820299)
+  - dupfind/build/CMakeFiles/4.1.2/CMakeSystem.cmake
+  - dupfind/build_deps/googletest-subbuild/CMakeFiles/4.1.2/CMakeSystem.cmake
+----------------------------------------
+File size: 41 bytes (Hash: 5282075761900802357)
+  - dupfind/.git/refs/heads/main
+  - dupfind/.git/refs/remotes/origin/main
+----------------------------------------
+File size: 4726 bytes (Hash: 4283462961482075888)
+  - dupfind/.git/hooks/fsmonitor-watchman.sample
+  - dupfind/build_deps/googletest-src/.git/hooks/fsmonitor-watchman.sample
+
+Total wasted space due to duplicates: 27731 bytes.
+```
+
+The final line shows the total amount of disk space occupied by redundant copies.
 
 ## Build
 
+Clone the repository and configure the project with CMake:
+
 ```bash
-git clone ...
+git clone <repository-url>
+cd dupfind
+
 cmake -B build
 cmake --build build -j
+```
+
+Run the test suite with:
+
+```bash
 ctest --test-dir build
 ```
 
@@ -41,11 +92,60 @@ ctest --test-dir build
 dupfind <dir> [--min-size N] [--format text|json|csv]
 ```
 
+Example:
+
+```bash
+dupfind .
+```
+
+JSON output:
+
+```bash
+dupfind . --format json
+```
+
+CSV output:
+
+```bash
+dupfind . --format csv
+```
+
+## Project structure
+
+```text
+dupfind/
+├── .github/
+├── └──workflows/
+        └──ci.yml
+├──app
+    └──main.cpp
+├── include/
+│   └── dupfind/
+├── src/
+├── tests/
+├── CMakeLists.txt
+└── README.md
+```
+
+## Testing
+
+The project uses [GoogleTest](https://github.com/google/googletest) for unit testing.
+
+Tests cover components including file scanning, hashing, grouping, and duplicate detection.
+
+Run all tests with:
+
+```bash
+ctest --test-dir build
+```
+
 ## Limitations
 
-FNV-1a is not a cryptographic hash. For forensic use, use SHA-256 instead.
+The current implementation uses **FNV-1a** for hashing. FNV-1a is not a cryptographic hash and should not be used as a security or forensic hash.
 
-`dupfind` does not perform a byte-by-byte comparison after hashing, so there is a theoretical possibility of hash collisions.
+`dupfind` currently considers files with the same size and hash to be duplicates without performing a final byte-by-byte comparison. Although hash collisions are unlikely in normal use, they are theoretically possible.
+
+For forensic or security-sensitive applications, a cryptographic hash such as SHA-256 and a final byte-by-byte comparison should be used.
 
 ## License
 
