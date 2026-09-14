@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <assert.h>
 
 #include "dupfind/grouper.hpp"
 #include "dupfind/hasher.hpp"
@@ -69,6 +70,27 @@ int main(int argc, char** argv) {
             std::cout << scan_result[i].paths[j] << std::endl;
         }
     } */
+
+    FileEntry f1 = {"testDir/a.txt", 0};
+    FileEntry f2 = {"testDir/b.txt", 0};
+
+    ScanResult scan = {{f1, f2}, {""}};
+
+    for (size_t i = 0; i < scan.files.size(); ++i) {
+        std::cout << scan.files[i].path << std::endl;
+    }
+
+    auto groups = scan_directory("testDir/");
+    std::cout << "Should work on test" << std::endl;
+    for (size_t i = 0; i < groups.files.size(); ++i) {
+        std::cout << groups.files[i].path << std::endl;
+        std::cout << groups.files[i].size << std::endl;
+        
+    }
+    for (int i = 0; i < groups.errors.size(); i++) {
+        std::cout << "here";
+        std::cout << groups.errors[i] << std::endl;
+    }
     
     return 0;
 }
