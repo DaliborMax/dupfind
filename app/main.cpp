@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 #include "dupfind/grouper.hpp"
 #include "dupfind/hasher.hpp"
@@ -48,5 +49,26 @@ int main(int argc, char** argv) {
     std::cout << "Total wasted space due to duplicates: "
               << total_wasted << " bytes.\n";
 
+    /* std::ofstream("a.txt") << "1234567890";
+    std::ofstream("b.txt") << "1234567890";
+    
+    std::vector<dupfind::FileEntry> _files {
+        {"a.txt", 10},
+        {"b.txt", 10},
+    };
+
+    std::vector<std::string> errors;
+
+    ScanResult scan{_files, errors};
+
+    std::vector<DuplicateGroup> scan_result = find_duplicates(_files);
+
+    for (size_t i = 0; i < scan_result.size(); ++i) {
+        for (size_t j = 0; j < scan_result[i].paths.size(); ++j) {
+
+            std::cout << scan_result[i].paths[j] << std::endl;
+        }
+    } */
+    
     return 0;
 }

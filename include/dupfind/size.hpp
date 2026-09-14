@@ -5,6 +5,6 @@
 
 namespace dupfind {
 
-std::uintmax_t get_file_size(const std::filesystem::path& path);
+    std::uintmax_t get_file_size(const std::filesystem::path& path);
 
 }

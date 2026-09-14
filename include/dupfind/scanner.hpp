@@ -15,7 +15,7 @@ namespace dupfind
         std::vector<std::string> errors;
 
         bool operator== (const ScanResult& s) const {
-            return files.data() == s.files.data() && errors.data() == s.errors.data();
+            return files == s.files && errors == s.errors;
         }
     };
 

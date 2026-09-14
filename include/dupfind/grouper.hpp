@@ -7,12 +7,12 @@
 
 namespace dupfind {
 
-std::vector<std::vector<FileEntry>>
-group_by_size(const std::vector<FileEntry>& files);
+    std::vector<std::vector<FileEntry>>
+    group_by_size(const std::vector<FileEntry>& files);
 
-std::uintmax_t wasted_bytes(const std::vector<DuplicateGroup>& groups);
+    std::uintmax_t wasted_bytes(const std::vector<DuplicateGroup>& groups);
 
-std::vector<DuplicateGroup>
-find_duplicates(const std::vector<FileEntry>& files);
+    std::vector<DuplicateGroup>
+    find_duplicates(const std::vector<FileEntry>& files);
 
 }   
